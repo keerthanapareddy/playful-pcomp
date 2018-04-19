@@ -11,7 +11,7 @@ Encoder race(4, 5);
 Encoder income(6, 7);
 Encoder education(2, 3);
 
-String raceLabels[] = { "black", "white", "asian", "hispanic", "other" };
+String raceLabels[] = { "black", "hispanic", "other", "asian", "white" };
 String incomeLabels[] = { "lower", "middle", "upper-middle", "upper" };
 String educationLabels[] = { "less-than-high-school", "high-school", "some-college", "bachelors", "advanced" };
 
