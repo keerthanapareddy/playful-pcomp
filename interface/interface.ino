@@ -15,13 +15,13 @@ String raceLabels[] = { "black", "hispanic", "other", "asian", "white" };
 String incomeLabels[] = { "lower", "middle", "upper-middle", "upper" };
 String educationLabels[] = { "less-than-high-school", "high-school", "some-college", "bachelors", "advanced" };
 
-long oldIncomePosition  = -999;
+long oldIncomePosition = -1;
 int incomeSelection = 0;
 
-long oldRacePosition  = -999;
+long oldRacePosition = -1;
 int raceSelection = 0;
 
-long oldEducationPosition  = -999;
+long oldEducationPosition = -1;
 int educationSelection = 0;
 
 int lastSearchButtonState = HIGH;
@@ -47,77 +47,6 @@ void setup() {
   pinMode(randomLedPin, OUTPUT);
 }
 
-// Random utility to "constrain" but wrapover
-int rollover(int x, int lower, int upper) {
-  int range = upper - lower;
-  while (x < lower) x += range;
-  while (x >= upper) x -= range;
-
-  return x;
-}
-
-int getEncoderSelection(int x, int num_selections) {
-  x = rollover(x, 0, num_selections);
-
-  // NB. The OBOB is not a bug. It's important!
-  //return map(x, 0, 80, 0, num_selections);
-
-  return x;
-}
-
-void checkIncomeEncoder() {
-  long incomePosition = income.read();
-
-  if (incomePosition != oldIncomePosition) {
-    if (incomePosition > oldIncomePosition) {
-      incomeSelection = getEncoderSelection(incomeSelection + 1, 4);
-    } else {
-      incomeSelection = getEncoderSelection(incomeSelection - 1, 4);
-    }
-
-    oldIncomePosition = incomePosition;
-
-    Serial.print("income,");
-    Serial.println(incomeLabels[incomeSelection]);
-  }
-}
-
-void checkRaceEncoder() {
-  long racePosition = race.read();
-
-  if (racePosition != oldRacePosition) {
-    if (racePosition > oldRacePosition) {
-      raceSelection = getEncoderSelection(raceSelection + 1, 5);
-    } else {
-      raceSelection = getEncoderSelection(raceSelection - 1, 5);
-    }
-
-    oldRacePosition = racePosition;
-
-    Serial.print("race,");
-    Serial.println(raceSelection);
-    //Serial.println(raceLabels[raceSelection]);
-  }
-}
-
-
-void checkEducationEncoder() {
-  long educationPosition = education.read();
-
-  if (educationPosition != oldEducationPosition) {
-    if (educationPosition > oldEducationPosition) {
-      educationSelection = getEncoderSelection(educationSelection + 1, 5);
-    } else {
-      educationSelection = getEncoderSelection(educationSelection - 1, 5);
-    }
-
-    oldEducationPosition = educationPosition;
-
-    Serial.print("education,");
-    Serial.println(educationLabels[educationSelection]);
-  }
-}
-
 void loop() {
   //== Check all our encoders
   checkIncomeEncoder();
@@ -130,7 +59,59 @@ void loop() {
   checkRandom();
 
   //== global delay
-  delay(50);
+  delay(1);
+}
+
+// Random utility to "constrain" but wrapover
+int rollover(int x, int lower, int upper) {
+  int range = upper - lower;
+  while (x < lower) x += range;
+  while (x >= upper) x -= range;
+
+  return x;
+}
+
+int getEncoderSelection(int x, int num_selections) {
+  x = rollover(x, 0, 80);
+
+  // NB. The OBOB is not a bug. It's important!
+  return map(x, 0, 80, 0, num_selections);
+}
+
+void checkIncomeEncoder() {
+  long incomePosition = income.read();
+
+  if (incomePosition != oldIncomePosition) {
+    incomeSelection = getEncoderSelection(incomePosition, 4);
+    oldIncomePosition = incomePosition;
+
+    Serial.print("income,");
+    Serial.println(incomeLabels[incomeSelection]);
+  }
+}
+
+void checkRaceEncoder() {
+  long racePosition = race.read();
+
+  if (racePosition != oldRacePosition) {
+    raceSelection = getEncoderSelection(racePosition, 5);
+    oldRacePosition = racePosition;
+
+    Serial.print("race,");
+    Serial.println(raceLabels[raceSelection]);
+  }
+}
+
+void checkEducationEncoder() {
+  long educationPosition = education.read();
+
+  if (educationPosition != oldEducationPosition) {
+    educationSelection = getEncoderSelection(educationPosition, 5);
+    oldEducationPosition = educationPosition;
+
+    Serial.print("education,");
+    Serial.println(educationLabels[educationSelection]);
+  }
 }
 
 void checkSearch() {
