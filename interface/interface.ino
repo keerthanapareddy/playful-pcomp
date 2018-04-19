@@ -6,6 +6,7 @@
 
 #define ENCODER_DO_NOT_USE_INTERRUPTS
 #include <Encoder.h>
+#include <Bounce2.h>
 
 Encoder race(4, 5);
 Encoder income(6, 7);
@@ -24,9 +25,9 @@ int raceSelection = 0;
 long oldEducationPosition = -1;
 int educationSelection = 0;
 
-int lastSearchButtonState = HIGH;
-int lastResetButtonState = HIGH;
-int lastRandomButtonState = HIGH;
+Bounce resetButton = Bounce();
+Bounce searchButton = Bounce();
+Bounce randomButton = Bounce();
 
 int searchButtonPin = 10;
 int searchLedPin = 11;
@@ -45,6 +46,13 @@ void setup() {
   pinMode(resetLedPin, OUTPUT);
   pinMode(searchLedPin, OUTPUT);
   pinMode(randomLedPin, OUTPUT);
+
+  searchButton.attach(searchButtonPin);
+  searchButton.interval(5);
+  resetButton.attach(resetButtonPin);
+  resetButton.interval(5);
+  randomButton.attach(randomButtonPin);
+  randomButton.interval(5);
 }
 
 void loop() {
@@ -115,45 +123,33 @@ void checkEducationEncoder() {
 }
 
 void checkSearch() {
-  int searchButtonState = digitalRead(searchButtonPin);
+  searchButton.update();
 
-  if (searchButtonState != lastSearchButtonState) {
-    if (searchButtonState == LOW) {
-      digitalWrite(searchLedPin, HIGH);
-      Serial.print("button,");
-      Serial.println("search");
-    }
+  if (searchButton.fell()) {
+    digitalWrite(searchLedPin, HIGH);
+    Serial.print("button,");
+    Serial.println("search");
   }
-
-  lastSearchButtonState = searchButtonState;
 }
 
 void checkReset() {
-  int resetButtonState = digitalRead(resetButtonPin);
+  resetButton.update();
 
-  if (resetButtonState != lastResetButtonState) {
-    if (resetButtonState == LOW) {
-      digitalWrite(resetLedPin, HIGH);
-      Serial.print("button,");
-      Serial.println("reset");
-    }
+  if (resetButton.fell()) {
+    digitalWrite(resetLedPin, HIGH);
+    Serial.print("button,");
+    Serial.println("reset");
   }
-
-  lastResetButtonState = resetButtonState;
 }
 
 void checkRandom() {
-  int randomButtonState = digitalRead(randomButtonPin);
+  randomButton.update();
 
-  if (randomButtonState != lastRandomButtonState) {
-    if (randomButtonState == LOW) {
-      digitalWrite(randomLedPin, HIGH);
-      Serial.print("button,");
-      Serial.println("random");
-    }
+  if (randomButton.fell()) {
+    digitalWrite(randomLedPin, HIGH);
+    Serial.print("button,");
+    Serial.println("random");
   }
-
-  lastRandomButtonState = randomButtonState;
 }
 
 
